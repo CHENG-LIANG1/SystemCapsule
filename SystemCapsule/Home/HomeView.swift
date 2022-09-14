@@ -111,8 +111,12 @@ struct HomeView: View {
 //      changeDarkMode(state: isDarkModeOn)
     }
     
+    func getLowPowerColor() -> Color{
+        return device.batteryState!.lowPowerMode ? Color.yellow : Color.green
+    }
+    
     func changeColorMode(state:Bool){
-        batteryColor = state ? Color.green : Color.BackgroundColor
+        batteryColor = state ? getLowPowerColor(): Color.BackgroundColor
         UserDefaultsUtils.shared.setColorMode(enable: state)
     }
     
@@ -123,7 +127,7 @@ struct HomeView: View {
     }
     
     func getImageName(){
-        if(device.batteryState!.lowPowerMode){
+        if(device.batteryState!.lowPowerMode && isColorModeOn){
             batteryColor = Color.yellow
         }else{
             batteryColor = isColorModeOn ? Color.green : Color.BackgroundColor
