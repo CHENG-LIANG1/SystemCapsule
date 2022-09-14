@@ -8,20 +8,35 @@
 import SwiftUI
 
 struct SingleInfoView: View {
+    var imageName: String
+    var description: String
+    var symbolColor: Color
     var body: some View {
-        GeometryReader { geo in
-                        VStack{
-                            Image(systemName: "battery.100")
-                            
-                        }
-                       .frame(width: geo.size.width, height: geo.size.height)
-                   
-               }
+        VStack{
+            Image(systemName: imageName)
+                .font(.system(size: 64))
+                .foregroundColor(symbolColor)
+                .padding(EdgeInsets(top: 0, leading: 0, bottom: 8, trailing: 0))
+            Text(description)
+                .font(.custom(K.roundedFont, size: 16))
+                .foregroundColor(Color.BackgroundColor)
+        }
     }
 }
 
+struct MultipleInfoView: View {
+    
+    var body: some View {
+        HStack {
+            
+        }
+    }
+}
+
+
+
 struct SingleInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        SingleInfoView()
+        SingleInfoView(imageName: "battery.100", description: "70% Charged", symbolColor: Color.green)
     }
 }
