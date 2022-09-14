@@ -8,6 +8,8 @@
 import SwiftUI
 import DeviceKit
 
+
+
 struct HomeView: View {
     
     @State private var batteryLevel = 0
