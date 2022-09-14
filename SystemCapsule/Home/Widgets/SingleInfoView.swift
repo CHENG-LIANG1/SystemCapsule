@@ -24,16 +24,6 @@ struct SingleInfoView: View {
     }
 }
 
-struct MultipleInfoView: View {
-    
-    var body: some View {
-        HStack {
-            
-        }
-    }
-}
-
-
 
 struct SingleInfoView_Previews: PreviewProvider {
     static var previews: some View {

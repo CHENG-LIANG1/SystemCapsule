@@ -12,7 +12,12 @@ struct ContentView: View {
         TabView {
             HomeView()
                 .tabItem {
-                    Label("Dashboard", systemImage: "iphone.circle")
+                    Label("Dashboard", systemImage: "iphone.circle.fill")
+                }
+            
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape.circle")
                 }
         }
     }
