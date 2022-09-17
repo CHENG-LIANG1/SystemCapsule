@@ -7,7 +7,7 @@
 
 import SwiftUI
 import DeviceKit
-
+import WidgetKit
 
 
 struct HomeView: View {
@@ -20,10 +20,10 @@ struct HomeView: View {
     
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isDarkModeOn = false
-    @State private var isColorModeOn = true
     @State private var batteryColor = Color.green
     @State private var batteryImage = "battery.100"
     
+    @State private var text = ""
     
     var ToggleThemeView: some View {
         Toggle("Dark Mode", isOn: $isDarkModeOn)
@@ -33,13 +33,6 @@ struct HomeView: View {
             .tint(Color.TextColorPrimary)
     }
     
-    var ToggleColorView: some View {
-        Toggle("Color Mode", isOn: $isColorModeOn)
-            .onChange(of: isColorModeOn) { (state)  in
-                changeColorMode(state: state)
-            }.labelsHidden()
-            .tint(Color.TextColorPrimary)
-    }
 
     var body: some View {
         NavigationView {
@@ -48,8 +41,6 @@ struct HomeView: View {
                 VStack() {
 
                     ToggleThemeView
-                    
-                    ToggleColorView
                     
                     ScrollView {
                         
@@ -66,6 +57,32 @@ struct HomeView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
        
                         }
+                        
+                        
+                    
+                        
+                        TextField("", text: $text)
+
+                            .modifier(PlaceholderStyle(showPlaceHolder: text.isEmpty,
+                                                       placeholder: "Enter Something", forgroundColor: Color.black))
+                            .modifier(
+                                
+                                gradientTextFieldModifier(radius: 15, startColor: Color.TextColorPrimary, endColor: Color.TextColorPrimary , textColor: Color.BackgroundColor, textSize: 18)
+
+                            )
+
+                        
+                            .padding(EdgeInsets(top: 16, leading: 24, bottom: 0, trailing: 24))
+                            .onSubmit {
+    
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to:nil, from:nil, for:nil)
+                                
+
+                                if(text.isEmpty){ return}
+                                
+                                WidgetCenter.shared.reloadAllTimelines()
+    
+                            }
                        
 
                     }
@@ -78,6 +95,9 @@ struct HomeView: View {
                 .navigationBarTitle("Dashboard", displayMode: .inline)
                 .navigationBarBackButtonHidden(true)
                 .foregroundColor(Color.BackgroundColor)
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to:nil, from:nil, for:nil)
+                }
             }
         }
         .background(Color.BackgroundColor)
@@ -96,9 +116,6 @@ struct HomeView: View {
         isDarkModeOn = UserDefaultsUtils.shared.getDarkMode()
         changeDarkMode(state: isDarkModeOn)
         
-        isColorModeOn = UserDefaultsUtils.shared.getColorMode()
-        changeColorMode(state: isColorModeOn)
-        
         
       //MARK: or use device theme
 //      if (colorScheme == .dark)
@@ -115,11 +132,7 @@ struct HomeView: View {
         return device.batteryState!.lowPowerMode ? Color.yellow : Color.green
     }
     
-    func changeColorMode(state:Bool){
-        batteryColor = state ? getLowPowerColor(): Color.BackgroundColor
-        UserDefaultsUtils.shared.setColorMode(enable: state)
-    }
-    
+
     func changeDarkMode(state: Bool){
       (UIApplication.shared.connectedScenes.first as?
       UIWindowScene)?.windows.first!.overrideUserInterfaceStyle = state ?   .dark : .light
@@ -127,10 +140,10 @@ struct HomeView: View {
     }
     
     func getImageName(){
-        if(device.batteryState!.lowPowerMode && isColorModeOn){
+        if(device.batteryState!.lowPowerMode){
             batteryColor = Color.yellow
         }else{
-            batteryColor = isColorModeOn ? Color.green : Color.BackgroundColor
+            batteryColor = Color.green
         }
         
         if device.batteryState == .charging(batteryLevel){

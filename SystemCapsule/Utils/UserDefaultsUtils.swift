@@ -21,14 +21,16 @@ class UserDefaultsUtils {
         return defaults.bool(forKey: Constants.DARK_MODE)
     }
     
-    func setColorMode(enable: Bool) {
-        let defaults = UserDefaults.standard
-        defaults.set(enable, forKey: Constants.COLOR_MODE)
+
+    func setWidgetText(text: String){
+        let userDefualts = UserDefaults(suiteName: "group.smallWidgetCache")
+        userDefualts?.setValue(text, forKey: Constants.WIDGET_TEXT)
     }
     
-    func getColorMode() -> Bool {
-        let defaults = UserDefaults.standard
-        return defaults.bool(forKey: Constants.COLOR_MODE)
+    func setWidgetImage(text: String){
+        let userDefualts = UserDefaults(suiteName: "group.smallWidgetCache")
+        userDefualts?.setValue(text, forKey: Constants.WIDGET_TEXT)
+            
     }
    
 }
