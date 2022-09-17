@@ -80,6 +80,8 @@ struct HomeView: View {
 
                                 if(text.isEmpty){ return}
                                 
+                                UserDefaultsUtils().setWidgetText(text: text)
+                                
                                 WidgetCenter.shared.reloadAllTimelines()
     
                             }

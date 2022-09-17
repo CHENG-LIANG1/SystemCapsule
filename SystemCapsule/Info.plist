@@ -5,6 +5,7 @@
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>ConfigurationIntent</string>
+		<string>SmallWidgetConfigurationIntent</string>
 	</array>
 </dict>
 </plist>

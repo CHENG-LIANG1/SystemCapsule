@@ -10,17 +10,32 @@ import SwiftUI
 import Intents
 
 struct Provider: IntentTimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), text: "", configuration: ConfigurationIntent())
+    typealias Entry = DeviceInfoEntry
+    
+    
+    func category(for config: SmallWidgetConfigurationIntent) -> InfoCategory {
+        switch config.Info {
+        case .storage:
+            return .Storage
+        case .battery:
+            return .Battery
+        case .unknown:
+            return .Guide
+        }
+    }
+    
+    
+    func placeholder(in context: Context) -> DeviceInfoEntry {
+        DeviceInfoEntry(date: Date(), category: .Guide, configuration: SmallWidgetConfigurationIntent())
     }
 
-    func getSnapshot(for configuration: ConfigurationIntent, in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(),  text: "",configuration: configuration)
+    func getSnapshot(for configuration: SmallWidgetConfigurationIntent, in context: Context, completion: @escaping (DeviceInfoEntry) -> ()) {
+        let entry = DeviceInfoEntry(date: Date(), category: category(for: configuration),configuration: configuration)
         completion(entry)
     }
 
-    func getTimeline(for configuration: ConfigurationIntent, in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var entries: [SimpleEntry] = []
+    func getTimeline(for configuration: SmallWidgetConfigurationIntent, in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+        var entries: [DeviceInfoEntry] = []
 
         let userDefualts = UserDefaults(suiteName: "group.smallWidgetCache")
         let text = userDefualts?.string(forKey: "WIDGET_TEXT") ?? "Empty"
@@ -29,7 +44,7 @@ struct Provider: IntentTimelineProvider {
         let currentDate = Date()
         for hourOffset in 0 ..< 5 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, text: text, configuration: configuration)
+            let entry = DeviceInfoEntry(date: entryDate, category: category(for: configuration), configuration: configuration)
             entries.append(entry)
         }
 
@@ -40,53 +55,96 @@ struct Provider: IntentTimelineProvider {
 
 
 
-struct SimpleEntry: TimelineEntry {
+struct DeviceInfoEntry: TimelineEntry {
     let date: Date
-    let text: String
-    let configuration: ConfigurationIntent
+    let category: InfoCategory
+    let configuration: SmallWidgetConfigurationIntent
 }
 
 struct SmallWidgetEntryView : View {
     var entry: Provider.Entry
+    var body: some View{
+        VStack {
+            InfoView(category: entry.category)
+        }
+    }
+}
 
+public enum InfoCategory: Int {
+    case Storage = 1
+    case Guide
+    case Battery
+    
+    func description() -> String {
+        switch self {
+        case .Battery:
+            return "Battery"
+        case .Storage:
+            return "Storage"
+        case .Guide:
+            return "Guide"
+        }
+    }
+}
+
+
+struct InfoView : View {
+    let category: InfoCategory
+    
     var body: some View {
-        ZStack {
-            GeometryReader { geo in
-                Image("background")
-                    .resizable()
-                    .aspectRatio( contentMode: .fill)
-                    .frame(width: geo.size.width, height: geo.size.height, alignment: .center)
+        switch category {
+        case .Battery:
+            ZStack {
+                Color.red
+                VStack{
+                    Text("Battery")
+                }
+            }
+        case .Storage:
+            ZStack {
+                Color.yellow
+                VStack{
+                    Text("Storage")
+                }
+            }
+            
+        case .Guide:
+            ZStack {
+                Color.white
+                
+                VStack (alignment: .leading, spacing: 4){
+                    Text("1. Long Press")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    Text("2. Edit Widget")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    Text("3. Select Category")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                }
+                .padding()
                 
             }
-
-            
-//            Text(entry.date, style: .time)
-//                .font(.system(size: 30, weight: .semibold, design: .rounded))
-//                .foregroundColor(.white)
-//
-            Text(entry.text)
-                .font(.system(size: 30, weight: .semibold, design: .rounded))
-                .foregroundColor(.white)
         }
     }
-}
+    
 
-@main
-struct SmallWidget: Widget {
-    let kind: String = "SmallWidget"
-
-    var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: ConfigurationIntent.self, provider: Provider()) { entry in
-            SmallWidgetEntryView(entry: entry)
+    @main
+    struct SmallWidget: Widget {
+        let kind: String = "InfoWidget"
+        
+        var body: some WidgetConfiguration {
+            IntentConfiguration(kind: kind, intent: SmallWidgetConfigurationIntent.self, provider: Provider()) { entry in
+                SmallWidgetEntryView(entry: entry)
+            }
+            .supportedFamilies([.systemSmall])
+            .configurationDisplayName("Info Widget")
+            .description("Display system info")
         }
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
     }
+    
+    //struct SmallWidget_Previews: PreviewProvider {
+    //    static var previews: some View {
+    //        SmallWidgetEntryView(entry: SimpleEntry(date: Date(), text:"", configuration: SmallWidgetConfigurationIntent()))
+    //            .previewContext(WidgetPreviewContext(family: .systemSmall))
+    //    }
+    //}
 }
-
-//struct SmallWidget_Previews: PreviewProvider {
-//    static var previews: some View {
-//        SmallWidgetEntryView(entry: SimpleEntry(date: Date(), configuration: ConfigurationIntent()))
-//            .previewContext(WidgetPreviewContext(family: .systemSmall))
-//    }
-//}
