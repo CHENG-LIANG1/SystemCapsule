@@ -114,11 +114,11 @@ struct InfoView : View {
                 
                 VStack (alignment: .leading, spacing: 4){
                     Text("1. Long Press")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     Text("2. Edit Widget")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    Text("3. Select Category")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    Text("3. Choose")
+                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
                 }
                 .padding()
                 
