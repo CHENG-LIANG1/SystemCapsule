@@ -94,12 +94,9 @@ struct InfoView : View {
     var body: some View {
         switch category {
         case .Battery:
-            ZStack {
-                Color.red
-                VStack{
-                    Text("Battery")
-                }
-            }
+            
+            BatteryWidget()
+            
         case .Storage:
             ZStack {
                 Color.yellow
